@@ -64,10 +64,10 @@ describe("Gilded Rose", function() {
     const items = gildedRose.updateQuality();
     expect(items[0].quality).toBe(50);
   })
-  it("aged brie does not continue to increase once over 50", function() {
+  it("aged brie does not go over 50, even if given a number over 50 to start", function() {
     const gildedRose = new Shop([new Item("Aged Brie", -1, 54)]);
     const items = gildedRose.updateQuality();
-    expect(items[0].quality).toBe(54);
+    expect(items[0].quality).toBe(50);
   })
   it("sulfuras does not change from 80", function() {
     const gildedRose = new Shop([new Item("Sulfuras, Hand of Ragnaros", 10, 80)]);
