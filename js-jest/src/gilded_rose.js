@@ -7,8 +7,43 @@ class Item {
 }
 
 class UpdatableItem extends Item {
-  constructor(name, sellIn, quality) {
-    super(name, sellIn, quality);
+  update() {
+    this.sellIn--;
+    const qualityChange = this.getQualityChange();
+    this.quality = Math.min(50, Math.max(0, this.quality + qualityChange));
+  }
+  getQualityChange() {
+    return this.sellIn > 0 ? -1 : -2;
+  }
+}
+
+class UpdatableBrieItem extends UpdatableItem {
+  getQualityChange() {
+    return this.sellIn > 0 ? 1 : 2;
+  }
+}
+
+class UpdatablePassesItem extends UpdatableItem {
+  getQualityChange() {
+    if (this.sellIn < 1) {
+      return -this.quality;
+    } else if (this.sellIn < 5) {
+      return 3;
+    } else if (this.sellIn < 10) {
+      return 2;
+    }
+    return 1;
+  }
+}
+
+class UpdatableSulfurasItem extends UpdatableItem {
+  update() {
+  }
+}
+
+class UpdatableConjuredItem extends UpdatableItem {
+  getQualityChange() {
+    return super.getQualityChange() * 2;
   }
 }
 
@@ -17,34 +52,31 @@ const PASSES = 'Backstage passes to a TAFKAL80ETC concert';
 const SULFURAS = 'Sulfuras, Hand of Ragnaros';
 const CONJURED = 'Conjured';
 
+function updatableItemFactory(item) {
+  switch (item.name) {
+    case BRIE:
+      return new UpdatableBrieItem(item.name, item.sellIn, item.quality);
+    case PASSES:
+      return new UpdatablePassesItem(item.name, item.sellIn, item.quality);
+    case SULFURAS:
+      return new UpdatableSulfurasItem(item.name, item.sellIn, item.quality);
+    case CONJURED:
+      return new UpdatableConjuredItem(item.name, item.sellIn, item.quality);
+    default:
+      return new UpdatableItem(item.name, item.sellIn, item.quality);
+  }
+}
+
 class Shop {
   constructor(items=[]){
     this.items = items;
   }
   updateQuality() {
-    for (let item of this.items) {
-      if (item.name === BRIE) {
-        item.sellIn--;
-        const qualityChange = item.sellIn > 0 ? 1 : 2;
-        item.quality = Math.min(50, item.quality + qualityChange);
-      } else if (item.name === PASSES) {
-        item.sellIn--;
-        let qualityChange = 1;
-        if (item.sellIn < 1) {
-          qualityChange = -item.quality;
-        } else if (item.sellIn < 5) {
-          qualityChange = 3;
-        } else if (item.sellIn < 10) {
-          qualityChange = 2;
-        }
-        item.quality = Math.min(50, item.quality + qualityChange);
-      } else if(item.name !== SULFURAS) {
-        item.sellIn--;
-        const qualityChange = item.sellIn > 0 ? -1 : -2;
-        item.quality = Math.max(0, item.quality + qualityChange);
-      }
-    }
-    return this.items;
+    return this.items.map(item => {
+      const updatableItem = updatableItemFactory(item);
+      updatableItem.update();
+      return updatableItem;
+    });
   }
 }
 

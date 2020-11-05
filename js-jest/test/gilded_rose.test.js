@@ -34,10 +34,10 @@ describe("Gilded Rose", function() {
     const items = gildedRose.updateQuality();
     expect(items[0].quality).toBe(0);
   })
-  it("foo goes down by 1 when over 50", function() {
+  it("foo goes to 50 when over 50", function() {
     const gildedRose = new Shop([new Item("foo", 10, 60)]);
     const items = gildedRose.updateQuality();
-    expect(items[0].quality).toBe(59);
+    expect(items[0].quality).toBe(50);
   })
   it("foo does goes to 0 when negative", function() {
     const gildedRose = new Shop([new Item("foo", 10, -10)]);
@@ -129,9 +129,14 @@ describe("Gilded Rose", function() {
     const items = gildedRose.updateQuality();
     expect(items[0].quality).toBe(50);
   })
-  it.skip("conjured degrades twice as fast", function() {
+  it("conjured degrades twice as fast", function() {
     const gildedRose = new Shop([new Item("Conjured", 5, 49)]);
     const items = gildedRose.updateQuality();
     expect(items[0].quality).toBe(47);
+  })
+  it("conjured degrades four times as fast past the sell in", function () {
+    const gildedRose = new Shop([new Item("Conjured", -1, 40)]);
+    const items = gildedRose.updateQuality();
+    expect(items[0].quality).toBe(36);
   })
 });
